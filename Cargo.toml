@@ -1,0 +1,84 @@
+[package]
+name = "googolswarm-proof-anchor"
+version = "1.0.0"
+edition = "2021"
+authors = ["ALN Sovereign Stack Contributors"]
+description = "Googolswarm integration for Organichain proof anchoring with bulk anchor and offline verification"
+license = "ASL-1.0"
+repository = "https://github.com/aln-sovereign/googolswarm-proof-anchor"
+documentation = "https://docs.rs/googolswarm-proof-anchor"
+keywords = ["aln", "googolswarm", "anchoring", "proof", "ledger"]
+categories = ["cryptography", "network", "database"]
+
+[dependencies]
+aln-syntax-core = { version = "1.0", path = "../aln-syntax-core" }
+row-rpm-ledger = { version = "1.0", path = "../row-rpm-ledger" }
+zes-crypto-lib = { version = "1.0", path = "../zes-crypto-lib" }
+serde = { version = "1.0", features = ["derive"] }
+serde_json = "1.0"
+thiserror = "1.0"
+hex = "0.4"
+sha3 = "0.10"
+chrono = { version = "0.4", features = ["serde"] }
+uuid = { version = "1.0", features = ["v4", "serde"] }
+log = "0.4"
+env_logger = "0.10"
+tokio = { version = "1.0", features = ["full"] }
+reqwest = { version = "0.11", features = ["json"] }
+sled = "0.34"
+bincode = "1.3"
+rand = "0.8"
+
+[dev-dependencies]
+criterion = "0.5"
+proptest = "1.0"
+tempfile = "3.0"
+serial_test = "2.0"
+tokio-test = "0.4"
+
+[lib]
+name = "googolswarm_proof_anchor"
+path = "src/lib.rs"
+crate-type = ["cdylib", "rlib"]
+
+[[bin]]
+name = "anchor-daemon"
+path = "src/bin/daemon.rs"
+
+[[bin]]
+name = "anchor-cli"
+path = "src/bin/cli.rs"
+
+[[bench]]
+name = "anchoring_throughput"
+harness = false
+
+[features]
+default = ["std", "full-anchoring"]
+std = []
+full-anchoring = ["tokio", "reqwest"]
+offline-mode = []
+encryption-at-rest = ["zes-crypto-lib"]
+
+[profile.release]
+lto = true
+codegen-units = 1
+strip = true
+panic = "abort"
+
+[profile.dev]
+opt-level = 0
+debug = true
+
+[package.metadata.docs.rs]
+all-features = true
+rustdoc-args = ["--cfg", "docsrs"]
+
+[[example]]
+name = "submit_batch"
+path = "examples/submit_batch.rs"
+
+[lints.clippy]
+all = "deny"
+pedantic = "warn"
+unsafe_code = "deny"
